@@ -1,0 +1,119 @@
+# Tender Opportunity Scanner — keyword configuration
+#
+# Edit this file to retune the scoring engine for a different service line
+# or company. Each keyword group has a weight: tier_1 is the strongest
+# positive signal, tier_3 is a weak corroborating signal, negative
+# keywords actively reject opportunities outside our scope.
+#
+# Multipliers and bonuses are applied AFTER keyword matches, so a
+# perfectly-matched tender in WA closing this month with value > $500k
+# can score >>100 — that's intentional. The HTML report caps the
+# display at 100 for readability but preserves raw scores for ranking.
+
+target_company:
+  name: "Subsea Solutions Pty Ltd"
+  service_line: "Subsea Inspection, Repair & Maintenance"
+  location: "Perth, Western Australia"
+
+# Tier 1 — direct match for our core service
+# These are the keywords that, if present, almost certainly mean
+# this tender is in our wheelhouse.
+tier_1:
+  weight: 30
+  terms:
+    - "subsea inspection"
+    - "rov inspection"
+    - "irm services"
+    - "pipeline integrity"
+    - "subsea repair"
+    - "offshore inspection"
+    - "underwater inspection"
+    - "cathodic protection"
+
+# Tier 2 — adjacent / supporting keywords
+# Often appear alongside our work but aren't conclusive alone.
+tier_2:
+  weight: 15
+  terms:
+    - "offshore"
+    - "subsea"
+    - "pipeline"
+    - "integrity management"
+    - "rov"
+    - "ndt"
+    - "non-destructive testing"
+    - "fpso"
+    - "riser"
+    - "wellhead"
+
+# Tier 3 — weak corroborating signals
+tier_3:
+  weight: 5
+  terms:
+    - "marine"
+    - "vessel"
+    - "survey"
+    - "maintenance"
+    - "asset integrity"
+    - "diving"
+    - "hydrographic"
+
+# Geographic boost — multiplier applied if these terms appear
+# Perth-based providers prefer WA work for mobilisation cost reasons.
+geographic_boost:
+  multiplier: 1.3
+  terms:
+    - "western australia"
+    - "wa "
+    - "perth"
+    - "fremantle"
+    - "north west shelf"
+    - "carnarvon"
+    - "pilbara"
+    - "browse basin"
+    - "timor sea"
+
+# Sector match — broader industry alignment
+sector_boost:
+  weight: 10
+  terms:
+    - "oil and gas"
+    - "oil & gas"
+    - "lng"
+    - "offshore energy"
+    - "resources sector"
+    - "petroleum"
+
+# Negative keywords — actively suppress wrong-industry tenders
+# These tenders may share surface words ("inspection") with our domain
+# but are clearly outside our scope. Subtract heavily.
+negative:
+  weight: -20
+  terms:
+    - "cleaning services"
+    - "catering"
+    - "stationery"
+    - "office furniture"
+    - "human resources"
+    - "legal services"
+    - "advertising"
+    - "training services"
+    - "it services"
+    - "software development"
+
+# Time bonus — favour tenders closing soon (action urgency)
+time_bonus:
+  closing_within_30_days: 5
+  closing_within_60_days: 2
+
+# Value bonus — favour higher-value opportunities
+# Values are AUD ex GST. Anything below 100k generally isn't
+# worth a formal tender response for our service profile.
+value_bonus:
+  above_500k: 10
+  above_2m: 20
+  above_10m: 30
+
+# Minimum score threshold for "qualified" status in the report.
+# Tenders below this get flagged grey and demoted to the bottom.
+qualified_threshold: 40

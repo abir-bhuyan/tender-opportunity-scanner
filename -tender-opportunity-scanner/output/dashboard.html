@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tender Opportunity Scanner — Dashboard</title>
+<style>
+  :root {
+    --navy: #0B3D5C;
+    --teal: #2A8E9A;
+    --coral: #FF7A1A;
+    --sand: #F3EFE6;
+    --ink: #1A1A1A;
+    --muted: #6B7785;
+    --line: #DDE3EA;
+    --green: #2F8F4F;
+    --amber: #C77700;
+    --red: #C3392C;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Helvetica, Arial, sans-serif;
+    background: #F7F8FA;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  /* ---- HEADER ---- */
+  header.dash-header {
+    background: var(--navy);
+    color: white;
+    padding: 28px 32px;
+    border-radius: 8px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .brand h1 {
+    font-size: 22px;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  .brand .sub {
+    font-size: 12px;
+    color: #B5C2D1;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .gen {
+    font-size: 12px;
+    color: #B5C2D1;
+    text-align: right;
+  }
+  .gen strong { color: white; display: block; font-size: 14px; }
+
+  /* ---- KPI ROW ---- */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .kpi {
+    background: white;
+    padding: 18px 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--coral);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .kpi .v {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+  .kpi .v small { font-size: 14px; color: var(--muted); font-weight: 500; }
+  .kpi .l {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ---- SECTION HEADINGS ---- */
+  h2.section {
+    font-size: 14px;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--coral);
+    margin: 0 0 18px;
+    display: inline-block;
+  }
+
+  /* ---- CARDS ---- */
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+  .card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px 22px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    border: 1px solid var(--line);
+  }
+  .card-head {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .score {
+    flex: 0 0 64px;
+    border-radius: 8px;
+    padding: 10px 0;
+    text-align: center;
+    color: white;
+  }
+  .score-num { font-size: 22px; font-weight: 800; line-height: 1; }
+  .score-lbl {
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+    opacity: 0.85;
+  }
+  .score-excellent { background: var(--green); }
+  .score-strong    { background: var(--teal); }
+  .score-ok        { background: var(--amber); }
+  .score-weak      { background: var(--muted); }
+
+  .card-title { flex: 1; min-width: 0; }
+  .card-title h3 {
+    font-size: 15px;
+    color: var(--navy);
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 3px;
+  }
+  .agency { font-size: 12px; color: var(--muted); }
+
+  .rationale {
+    font-size: 12.5px;
+    color: var(--ink);
+    background: var(--sand);
+    padding: 10px 14px;
+    border-radius: 6px;
+    border-left: 3px solid var(--coral);
+    margin-bottom: 14px;
+  }
+
+  .card-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .meta-lbl {
+    font-size: 9.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .meta-val {
+    font-size: 12.5px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .urgency-urgent { color: var(--red); }
+  .urgency-soon   { color: var(--amber); }
+  .urgency-later  { color: var(--ink); }
+  .urgency-closed { color: var(--muted); text-decoration: line-through; }
+
+  .card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .tender-id { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  .open-link {
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .open-link:hover { text-decoration: underline; }
+
+  /* ---- TABLE (others) ---- */
+  table.others {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    font-size: 12.5px;
+  }
+  table.others th {
+    background: var(--navy);
+    color: white;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  table.others td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .tr-score {
+    font-weight: 700;
+    color: var(--muted);
+    width: 50px;
+  }
+  .tr-title { font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .tr-rationale { color: var(--muted); font-size: 11.5px; }
+
+  /* ---- FOOTER ---- */
+  footer.dash-footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .empty {
+    background: white;
+    padding: 32px;
+    border-radius: 8px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  @media (max-width: 720px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .card-meta { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="dash-header">
+    <div class="brand">
+      <h1>Tender Opportunity Scanner</h1>
+      <div class="sub">For: Subsea Solutions Pty Ltd</div>
+    </div>
+    <div class="gen">
+      <strong>20 May 2026, 12:54</strong>
+      Dashboard last refreshed
+    </div>
+  </header>
+
+  <section class="kpis">
+    <div class="kpi">
+      <div class="v">15<small> / 20</small></div>
+      <div class="l">Qualified tenders</div>
+    </div>
+    <div class="kpi">
+      <div class="v">$106.3<small>M AUD</small></div>
+      <div class="l">Qualified pipeline value</div>
+    </div>
+    <div class="kpi">
+      <div class="v">7</div>
+      <div class="l">Closing within 30 days</div>
+    </div>
+    <div class="kpi">
+      <div class="v">20</div>
+      <div class="l">Total scanned</div>
+    </div>
+  </section>
+
+  <h2 class="section">Qualified opportunities</h2>
+  <div class="cards">
+    
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">100</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Subsea Inspection and Pipeline Integrity Assessment — North West Shelf</h3>
+          <div class="agency">Major Offshore Operator (publicly tendered)</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;western australia&#x27;, &#x27;subsea inspection&#x27;, &#x27;pipeline integrity&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$4.5M – $7.0M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Western Australia</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-soon">Closes in 26 d</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0142</span>
+        <a href="https://example.austender.gov.au/AT-2026-0142" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">100</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Subsea Repair and Cathodic Protection Retrofit — Pilbara Region</h3>
+          <div class="agency">WA Resources Sector Operator</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;pilbara&#x27;, &#x27;subsea repair&#x27;, &#x27;cathodic protection&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$3.2M – $4.8M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Pilbara, WA</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-soon">Closes in 19 d</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0174</span>
+        <a href="https://example.austender.gov.au/AT-2026-0174" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">100</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Wellhead Integrity Assessment — Producing Gas Field</h3>
+          <div class="agency">Upstream Petroleum Operator</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;north west shelf&#x27;, &#x27;rov inspection&#x27;, &#x27;cathodic protection&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$2.8M – $4.2M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">North West Shelf, WA</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-soon">Closes in 29 d</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0288</span>
+        <a href="https://example.austender.gov.au/AT-2026-0288" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">100</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Offshore Pipeline NDT and Integrity Reporting — Timor Sea</h3>
+          <div class="agency">Petroleum Asset Joint Venture</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;timor sea&#x27;, &#x27;pipeline integrity&#x27;, &#x27;&gt;$2M&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$1.5M – $3.0M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Timor Sea</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-urgent">Closes in 10 d</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0089</span>
+        <a href="https://example.austender.gov.au/AT-2026-0089" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">100</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>ROV Inspection Services Framework — Browse Basin LNG Assets</h3>
+          <div class="agency">Tier-1 Energy Operator</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;western australia&#x27;, &#x27;rov inspection&#x27;, &#x27;&gt;$10M&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$8.0M – $25.0M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Western Australia / Browse Basin</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-07-10</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0156</span>
+        <a href="https://example.austender.gov.au/AT-2026-0156" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">100</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Integrated IRM Services — Multi-Asset Framework</h3>
+          <div class="agency">National Energy Operator</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;irm services&#x27;, &#x27;&gt;$10M&#x27;, &#x27;offshore&#x27;. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$40.0M – $75.0M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Multiple offshore basins, WA-led</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-08-30</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0422</span>
+        <a href="https://example.austender.gov.au/AT-2026-0422" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">100</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>FPSO Mooring and Riser Inspection Campaign</h3>
+          <div class="agency">Floating Asset Operator</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;western australia&#x27;, &#x27;&gt;$2M&#x27;, &#x27;offshore&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$2.1M – $3.5M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Offshore Western Australia</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-06-30</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0211</span>
+        <a href="https://example.austender.gov.au/AT-2026-0211" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">87</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Offshore Wind Foundation Inspection — Bass Strait Pilot</h3>
+          <div class="agency">Offshore Wind Developer</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;subsea inspection&#x27;, &#x27;offshore&#x27;, &#x27;subsea&#x27;. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$1.2M – $1.8M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Bass Strait, Victoria</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-07-15</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0263</span>
+        <a href="https://example.austender.gov.au/AT-2026-0263" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-excellent">
+          <div class="score-num">84</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Cathodic Protection Survey — Onshore Pipeline Network</h3>
+          <div class="agency">Gas Distribution Operator</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;cathodic protection&#x27;, &#x27;western australia&#x27;, &#x27;pipeline&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$0.7M – $1.1M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Western Australia</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-soon">Closes in 21 d</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0389</span>
+        <a href="https://example.austender.gov.au/AT-2026-0389" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-strong">
+          <div class="score-num">78</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Underwater Inspection of Port Infrastructure — Fremantle</h3>
+          <div class="agency">Fremantle Ports</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;underwater inspection&#x27;, &#x27;western australia&#x27;, &#x27;rov&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$0.3M – $0.5M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Fremantle, Western Australia</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-urgent">Closes in 5 d</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">Tenders WA (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">WA-DPIRD-2026-022</span>
+        <a href="https://example.tenders.wa.gov.au/WA-DPIRD-2026-022" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-strong">
+          <div class="score-num">78</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Marine NDT Services Panel — Offshore Energy Assets</h3>
+          <div class="agency">Offshore Energy Industry Group</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;perth&#x27;, &#x27;offshore&#x27;, &#x27;rov&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">Value not disclosed</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Australia-wide (Perth-favoured)</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-08-15</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0345</span>
+        <a href="https://example.austender.gov.au/AT-2026-0345" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-ok">
+          <div class="score-num">55</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Subsea Cable Route Survey and Post-Lay Inspection — Tasmania Link</h3>
+          <div class="agency">Subsea Cable Operator</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;&gt;$2M&#x27;, &#x27;subsea&#x27;, &#x27;rov&#x27;. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$5.5M – $8.0M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Bass Strait</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-07-25</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0301</span>
+        <a href="https://example.austender.gov.au/AT-2026-0301" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-ok">
+          <div class="score-num">48</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Diving Services — Port Inspection and Light Repair</h3>
+          <div class="agency">Pilbara Ports Authority</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;rov&#x27;, &#x27;pilbara&#x27;, &#x27;&gt;$500k&#x27;. WA-relevant location. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$0.8M – $1.2M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Pilbara, WA</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-06-22</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">Tenders WA (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">WA-PT-2026-019</span>
+        <a href="https://example.tenders.wa.gov.au/WA-PT-2026-019" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-ok">
+          <div class="score-num">45</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Catering Services — Offshore Accommodation Vessel</h3>
+          <div class="agency">Offshore Construction Contractor</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;offshore&#x27;, &#x27;subsea&#x27;, &#x27;rov&#x27;. but penalised by &#x27;catering&#x27;. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$0.9M – $1.4M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Offshore WA</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-soon">Closes in 23 d</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0317</span>
+        <a href="https://example.austender.gov.au/AT-2026-0317" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+
+    <article class="card">
+      <div class="card-head">
+        <div class="score score-ok">
+          <div class="score-num">42</div>
+          <div class="score-lbl">SCORE</div>
+        </div>
+        <div class="card-title">
+          <h3>Geotechnical Survey — Offshore Wind Site Assessment</h3>
+          <div class="agency">Renewable Energy Developer</div>
+        </div>
+      </div>
+
+      <div class="rationale">Matches: &#x27;&gt;$2M&#x27;, &#x27;offshore&#x27;, &#x27;survey&#x27;. Qualified for tender review.</div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-lbl">Value</div>
+          <div class="meta-val">$1.8M – $2.8M AUD</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Location</div>
+          <div class="meta-val">Bass Strait, Victoria</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Closing</div>
+          <div class="meta-val urgency-later">Closes 2026-07-05</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Source</div>
+          <div class="meta-val">AusTender (sample)</div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="tender-id">AT-2026-0438</span>
+        <a href="https://example.austender.gov.au/AT-2026-0438" class="open-link">View tender &rarr;</a>
+      </div>
+    </article>
+    
+  </div>
+
+  <h2 class="section">Filtered out (below threshold)</h2>
+  <table class="others">
+    <thead>
+      <tr>
+        <th>Score</th>
+        <th>Tender</th>
+        <th>Agency</th>
+        <th>Value</th>
+        <th>Closing</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    <tr>
+      <td class="tr-score">27</td>
+      <td>
+        <div class="tr-title">Hydrographic Survey Services — Coastal Queensland</div>
+        <div class="tr-rationale">Matches: &#x27;&gt;$500k&#x27;, &#x27;marine&#x27;, &#x27;survey&#x27;. Below qualification threshold.</div>
+      </td>
+      <td>Maritime Safety Authority</td>
+      <td>$0.6M – $0.9M AUD</td>
+      <td class="urgency-later">Closes 2026-06-20</td>
+    </tr>
+    
+
+    <tr>
+      <td class="tr-score">13</td>
+      <td>
+        <div class="tr-title">Vessel Hull Cleaning Services — Multiple WA Ports</div>
+        <div class="tr-rationale">Matches: &#x27;ndt&#x27;, &#x27;marine&#x27;, &#x27;vessel&#x27;. WA-relevant location. but penalised by &#x27;cleaning services&#x27;. Below qualification threshold.</div>
+      </td>
+      <td>WA Ports Authority</td>
+      <td>$0.3M – $0.6M AUD</td>
+      <td class="urgency-soon">Closes in 16 d</td>
+    </tr>
+    
+
+    <tr>
+      <td class="tr-score">0</td>
+      <td>
+        <div class="tr-title">Office Furniture Supply — Regional Government Offices</div>
+        <div class="tr-rationale">Matches: &#x27;&gt;$500k&#x27;, &#x27;&lt;60 days&#x27;. but penalised by &#x27;office furniture&#x27;. Below qualification threshold.</div>
+      </td>
+      <td>Department of Regional Development</td>
+      <td>$0.5M – $0.8M AUD</td>
+      <td class="urgency-later">Closes 2026-06-25</td>
+    </tr>
+    
+
+    <tr>
+      <td class="tr-score">0</td>
+      <td>
+        <div class="tr-title">Training Services — Workplace Safety Modules</div>
+        <div class="tr-rationale">Matches: &#x27;resources sector&#x27;, &#x27;&lt;60 days&#x27;. but penalised by &#x27;training services&#x27;. Below qualification threshold.</div>
+      </td>
+      <td>State Training Authority</td>
+      <td>$0.3M – $0.5M AUD</td>
+      <td class="urgency-later">Closes 2026-06-30</td>
+    </tr>
+    
+
+    <tr>
+      <td class="tr-score">0</td>
+      <td>
+        <div class="tr-title">Software Development — Asset Management Platform</div>
+        <div class="tr-rationale">Matches: &#x27;&gt;$2M&#x27;, &#x27;&lt;60 days&#x27;. but penalised by &#x27;it services&#x27;, &#x27;software development&#x27;. Below qualification threshold.</div>
+      </td>
+      <td>Infrastructure Operator</td>
+      <td>$1.8M – $2.5M AUD</td>
+      <td class="urgency-later">Closes 2026-06-28</td>
+    </tr>
+    
+    </tbody>
+  </table>
+
+  <footer class="dash-footer">
+    Generated by the Tender Opportunity Scanner (portfolio piece).
+    Sample data shown for demo purposes — see README for live-source notes.
+  </footer>
+
+</div>
+</body>
+</html>
